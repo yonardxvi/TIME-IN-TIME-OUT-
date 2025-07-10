@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TCC Library Monitoring</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .buttons button {
+      flex: 1;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .buttons button:hover {
+      background-color: #0056b3;
+    }
+    .admin-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>TCC Library Monitoring</h1>
+    <p>Fill in your details and click Time In or Time Out.</p>
+
+    <label for="name">Name:</label>
+    <input type="text" id="name" required>
+
+    <label for="program">Program:</label>
+    <input type="text" id="program" required>
+
+    <label for="purpose">Purpose:</label>
+    <input type="text" id="purpose" required>
+
+    <div class="buttons">
+      <button onclick="submitData('Time In')">Time In</button>
+      <button onclick="submitData('Time Out')">Time Out</button>
+    </div>
+  </div>
+
+  <script>
+    const webhookURL = "https://script.google.com/macros/s/AKfycbyuLscfTqUTzBnz7XeJ1BVYFeNbAL4viEIJweQ1WflNzN1ud07MSP4cKQ54LraSdnH64Q/exec";
+
+    function submitData(status) {
+      const name = document.getElementById("name").value.trim();
+      const program = document.getElementById("program").value.trim();
+      const purpose = document.getElementById("purpose").value.trim();
+      const now = new Date();
+      const date = now.toLocaleDateString();
+      const time = now.toLocaleTimeString();
+
+      if (!name || !program || !purpose) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const data = {
+        date,
+        time,
+        name,
+        program,
+        purpose,
+        status
+      };
+
+      fetch(webhookURL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.text())
+      .then(response => {
+        alert(`${status} recorded successfully!`);
+        document.getElementById("name").value = "";
+        document.getElementById("program").value = "";
+        document.getElementById("purpose").value = "";
+      })
+      .catch(error => {
+        alert("Failed to send data. Please check your internet connection.");
+        console.error("Error:", error);
+      });
+    }
+  </script>
+</body>
+</html>
